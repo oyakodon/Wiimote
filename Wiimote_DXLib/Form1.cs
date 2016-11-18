@@ -33,9 +33,38 @@ namespace Wiimote_DXLib
 
         public void DXUpdate()
         {
+            DX.VECTOR Model;
+            Model.x = Model.y = Model.z = 0.0f;
+
+            int mHandle = DX.MV1LoadModel("Yukari/結月ゆかり_純_ver1.0.pmd");
+            var keys = new byte[256];
+
+            DX.SetCameraNearFar(0.1f, 1000.0f);
+
             while (DX.ProcessMessage() == 0 && this.Created)
             {
+                DX.ClearDrawScreen();
 
+                DX.GetHitKeyStateAll(out keys[0]);
+                
+                if (keys[DX.KEY_INPUT_ESCAPE] != 0)
+                {
+                    break;
+                }
+
+                DX.SetCameraPositionAndTarget_UpVecY(DX.VGet(0, 10, -20), DX.VGet(0.0f, 10.0f, 0.0f));
+
+                if (keys[DX.KEY_INPUT_RIGHT] != 0) Model.x += 0.1f;
+                if (keys[DX.KEY_INPUT_LEFT] != 0) Model.x -= 0.1f;
+
+                if (keys[DX.KEY_INPUT_UP] != 0) Model.z -= 0.1f;
+                if (keys[DX.KEY_INPUT_DOWN] != 0) Model.z += 0.1f;
+
+                if (keys[DX.KEY_INPUT_SPACE] != 0) Model.y -= 0.1f;
+                if (keys[DX.KEY_INPUT_LSHIFT] != 0) Model.y += 0.1f;
+
+                DX.MV1SetPosition(mHandle, Model);
+                DX.MV1DrawModel(mHandle);
 
                 DX.ScreenFlip();
                 Application.DoEvents();
