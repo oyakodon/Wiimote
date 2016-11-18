@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiimote_IOCheck", "Wiimote_IOCheck\Wiimote_IOCheck.csproj", "{77F99429-19B7-4403-B874-09098A112A4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiimote_DXLib", "Wiimote_DXLib\Wiimote_DXLib.csproj", "{2BA0ADF5-A52C-4F6C-A2E0-ED4AD9ED77F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiimote_Mouse", "Wiimote_Mouse\Wiimote_Mouse.csproj", "{73FC613F-A6E0-4697-91C2-19EFB07748F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77F99429-19B7-4403-B874-09098A112A4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77F99429-19B7-4403-B874-09098A112A4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77F99429-19B7-4403-B874-09098A112A4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77F99429-19B7-4403-B874-09098A112A4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BA0ADF5-A52C-4F6C-A2E0-ED4AD9ED77F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BA0ADF5-A52C-4F6C-A2E0-ED4AD9ED77F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BA0ADF5-A52C-4F6C-A2E0-ED4AD9ED77F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BA0ADF5-A52C-4F6C-A2E0-ED4AD9ED77F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73FC613F-A6E0-4697-91C2-19EFB07748F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73FC613F-A6E0-4697-91C2-19EFB07748F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73FC613F-A6E0-4697-91C2-19EFB07748F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73FC613F-A6E0-4697-91C2-19EFB07748F1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
