@@ -295,9 +295,7 @@ paket-files/
 .fake/
 
 <<<<<<< HEAD
-# OYKDN Custom
-Wiimote_DXLib/
-Wiimote_IOCheck/
+
 =======
 # JetBrains Rider
 .idea/
