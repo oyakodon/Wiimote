@@ -199,10 +199,16 @@ namespace Wiimote_Mouse
             if (previousBtns.Home && !ws.ButtonState.Home )
             {
                 // マウスカーソルを画面の真ん中に
-                var wa = Screen.GetWorkingArea(Cursor.Position);
-                CursorPoint = new System.Drawing.Point(wa.Width / 2, wa.Height / 2);
+                var s = Screen.FromPoint(Cursor.Position);
+                CursorPoint = new System.Drawing.Point(s.Bounds.X + s.Bounds.Width / 2, s.Bounds.Y + s.Bounds.Height / 2);
                 Cursor.Position = CursorPoint;
 
+            }
+
+            // 1・2ボタンで終了(デバッグ用？)
+            if (ws.ButtonState.One && ws.ButtonState.Two)
+            {
+                this.Close();
             }
 
             previousBtns = ws.ButtonState;
