@@ -50,17 +50,17 @@ namespace Wiimote_DXLib
             catch (WiimoteNotFoundException ex)
             {
                 MessageBox.Show(ex.Message, "Wiimote not found error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                Environment.Exit(1);
             }
             catch (WiimoteException ex)
             {
                 MessageBox.Show(ex.Message, "Wiimote error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                Environment.Exit(1);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Unknown error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                Environment.Exit(1);
             }
 
             // DX
