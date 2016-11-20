@@ -28,6 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.clbButtons = new System.Windows.Forms.CheckedListBox();
             this.chkLED1 = new System.Windows.Forms.CheckBox();
             this.chkLED2 = new System.Windows.Forms.CheckBox();
@@ -40,6 +46,7 @@
             this.lblChuk = new System.Windows.Forms.Label();
             this.lblChukJoy = new System.Windows.Forms.Label();
             this.gb_Chuk = new System.Windows.Forms.GroupBox();
+            this.chkNGraph = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblCOG = new System.Windows.Forms.Label();
             this.lblBBTotal = new System.Windows.Forms.Label();
@@ -52,8 +59,18 @@
             this.lblBattery = new System.Windows.Forms.Label();
             this.lblDevicePath = new System.Windows.Forms.Label();
             this.chkExtension = new System.Windows.Forms.CheckBox();
+            this.ch_x_axis = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.ch_y_axis = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.ch_z_axis = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chkGraph = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.gb_Chuk.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ch_x_axis)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ch_y_axis)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ch_z_axis)).BeginInit();
             this.SuspendLayout();
             // 
             // clbButtons
@@ -79,7 +96,7 @@
             // chkLED1
             // 
             this.chkLED1.AutoSize = true;
-            this.chkLED1.Location = new System.Drawing.Point(12, 288);
+            this.chkLED1.Location = new System.Drawing.Point(12, 290);
             this.chkLED1.Name = "chkLED1";
             this.chkLED1.Size = new System.Drawing.Size(51, 16);
             this.chkLED1.TabIndex = 1;
@@ -90,7 +107,7 @@
             // chkLED2
             // 
             this.chkLED2.AutoSize = true;
-            this.chkLED2.Location = new System.Drawing.Point(69, 288);
+            this.chkLED2.Location = new System.Drawing.Point(69, 290);
             this.chkLED2.Name = "chkLED2";
             this.chkLED2.Size = new System.Drawing.Size(51, 16);
             this.chkLED2.TabIndex = 2;
@@ -101,7 +118,7 @@
             // chkLED3
             // 
             this.chkLED3.AutoSize = true;
-            this.chkLED3.Location = new System.Drawing.Point(126, 288);
+            this.chkLED3.Location = new System.Drawing.Point(126, 290);
             this.chkLED3.Name = "chkLED3";
             this.chkLED3.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.chkLED3.Size = new System.Drawing.Size(51, 16);
@@ -113,7 +130,7 @@
             // chkLED4
             // 
             this.chkLED4.AutoSize = true;
-            this.chkLED4.Location = new System.Drawing.Point(183, 288);
+            this.chkLED4.Location = new System.Drawing.Point(183, 290);
             this.chkLED4.Name = "chkLED4";
             this.chkLED4.Size = new System.Drawing.Size(51, 16);
             this.chkLED4.TabIndex = 4;
@@ -124,7 +141,7 @@
             // chkRumble
             // 
             this.chkRumble.AutoSize = true;
-            this.chkRumble.Location = new System.Drawing.Point(261, 288);
+            this.chkRumble.Location = new System.Drawing.Point(261, 290);
             this.chkRumble.Name = "chkRumble";
             this.chkRumble.Size = new System.Drawing.Size(62, 16);
             this.chkRumble.TabIndex = 5;
@@ -135,7 +152,7 @@
             // lblAccel
             // 
             this.lblAccel.AutoSize = true;
-            this.lblAccel.Location = new System.Drawing.Point(12, 328);
+            this.lblAccel.Location = new System.Drawing.Point(12, 253);
             this.lblAccel.Name = "lblAccel";
             this.lblAccel.Size = new System.Drawing.Size(25, 12);
             this.lblAccel.TabIndex = 6;
@@ -181,16 +198,29 @@
             // 
             // gb_Chuk
             // 
+            this.gb_Chuk.Controls.Add(this.chkNGraph);
             this.gb_Chuk.Controls.Add(this.chkC);
             this.gb_Chuk.Controls.Add(this.lblChukJoy);
             this.gb_Chuk.Controls.Add(this.chkZ);
             this.gb_Chuk.Controls.Add(this.lblChuk);
-            this.gb_Chuk.Location = new System.Drawing.Point(241, 168);
+            this.gb_Chuk.Location = new System.Drawing.Point(281, 168);
             this.gb_Chuk.Name = "gb_Chuk";
             this.gb_Chuk.Size = new System.Drawing.Size(250, 114);
             this.gb_Chuk.TabIndex = 11;
             this.gb_Chuk.TabStop = false;
             this.gb_Chuk.Text = "Nunchuk";
+            // 
+            // chkNGraph
+            // 
+            this.chkNGraph.AutoSize = true;
+            this.chkNGraph.Location = new System.Drawing.Point(177, 18);
+            this.chkNGraph.Name = "chkNGraph";
+            this.chkNGraph.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.chkNGraph.Size = new System.Drawing.Size(54, 16);
+            this.chkNGraph.TabIndex = 20;
+            this.chkNGraph.Text = "Graph";
+            this.chkNGraph.UseVisualStyleBackColor = true;
+            this.chkNGraph.CheckedChanged += new System.EventHandler(this.chkNGraph_CheckedChanged);
             // 
             // groupBox1
             // 
@@ -290,10 +320,10 @@
             // 
             // lblDevicePath
             // 
-            this.lblDevicePath.AutoSize = true;
-            this.lblDevicePath.Location = new System.Drawing.Point(10, 372);
+            this.lblDevicePath.AutoEllipsis = true;
+            this.lblDevicePath.Location = new System.Drawing.Point(10, 313);
             this.lblDevicePath.Name = "lblDevicePath";
-            this.lblDevicePath.Size = new System.Drawing.Size(35, 12);
+            this.lblDevicePath.Size = new System.Drawing.Size(437, 62);
             this.lblDevicePath.TabIndex = 14;
             this.lblDevicePath.Text = "label1";
             // 
@@ -307,11 +337,111 @@
             this.chkExtension.Text = "None";
             this.chkExtension.UseVisualStyleBackColor = true;
             // 
+            // ch_x_axis
+            // 
+            this.ch_x_axis.AntiAliasing = System.Windows.Forms.DataVisualization.Charting.AntiAliasingStyles.None;
+            chartArea1.AxisX.Maximum = 200D;
+            chartArea1.AxisY.Maximum = 150D;
+            chartArea1.AxisY.Minimum = -150D;
+            chartArea1.Name = "ChartArea1";
+            this.ch_x_axis.ChartAreas.Add(chartArea1);
+            this.ch_x_axis.Location = new System.Drawing.Point(571, 12);
+            this.ch_x_axis.Name = "ch_x_axis";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.Name = "Series1";
+            this.ch_x_axis.Series.Add(series1);
+            this.ch_x_axis.Size = new System.Drawing.Size(469, 356);
+            this.ch_x_axis.TabIndex = 16;
+            this.ch_x_axis.Text = "chart1";
+            // 
+            // ch_y_axis
+            // 
+            this.ch_y_axis.AntiAliasing = System.Windows.Forms.DataVisualization.Charting.AntiAliasingStyles.None;
+            chartArea2.AxisX.Maximum = 200D;
+            chartArea2.AxisY.Maximum = 150D;
+            chartArea2.AxisY.Minimum = -150D;
+            chartArea2.Name = "ChartArea1";
+            this.ch_y_axis.ChartAreas.Add(chartArea2);
+            this.ch_y_axis.Location = new System.Drawing.Point(4, 378);
+            this.ch_y_axis.Name = "ch_y_axis";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.Name = "Series1";
+            this.ch_y_axis.Series.Add(series2);
+            this.ch_y_axis.Size = new System.Drawing.Size(469, 356);
+            this.ch_y_axis.TabIndex = 17;
+            this.ch_y_axis.Text = "chart1";
+            // 
+            // ch_z_axis
+            // 
+            this.ch_z_axis.AntiAliasing = System.Windows.Forms.DataVisualization.Charting.AntiAliasingStyles.None;
+            chartArea3.AxisX.Maximum = 200D;
+            chartArea3.AxisY.Maximum = 150D;
+            chartArea3.AxisY.Minimum = -150D;
+            chartArea3.Name = "ChartArea1";
+            this.ch_z_axis.ChartAreas.Add(chartArea3);
+            this.ch_z_axis.Location = new System.Drawing.Point(571, 378);
+            this.ch_z_axis.Name = "ch_z_axis";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.Name = "Series1";
+            this.ch_z_axis.Series.Add(series3);
+            this.ch_z_axis.Size = new System.Drawing.Size(469, 356);
+            this.ch_z_axis.TabIndex = 18;
+            this.ch_z_axis.Text = "chart1";
+            // 
+            // chkGraph
+            // 
+            this.chkGraph.AutoSize = true;
+            this.chkGraph.Location = new System.Drawing.Point(458, 290);
+            this.chkGraph.Name = "chkGraph";
+            this.chkGraph.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.chkGraph.Size = new System.Drawing.Size(54, 16);
+            this.chkGraph.TabIndex = 19;
+            this.chkGraph.Text = "Graph";
+            this.chkGraph.UseVisualStyleBackColor = true;
+            this.chkGraph.CheckedChanged += new System.EventHandler(this.chkGraph_CheckedChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(2, 375);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(14, 12);
+            this.label1.TabIndex = 20;
+            this.label1.Text = "Y:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(569, 9);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(14, 12);
+            this.label2.TabIndex = 21;
+            this.label2.Text = "X:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(569, 375);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(14, 12);
+            this.label3.TabIndex = 22;
+            this.label3.Text = "Z:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(543, 393);
+            this.ClientSize = new System.Drawing.Size(1074, 734);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.chkGraph);
+            this.Controls.Add(this.ch_z_axis);
+            this.Controls.Add(this.ch_y_axis);
+            this.Controls.Add(this.ch_x_axis);
             this.Controls.Add(this.chkExtension);
             this.Controls.Add(this.lblDevicePath);
             this.Controls.Add(this.lblBattery);
@@ -325,6 +455,7 @@
             this.Controls.Add(this.chkLED2);
             this.Controls.Add(this.chkLED1);
             this.Controls.Add(this.clbButtons);
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "IOCheck";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -333,6 +464,9 @@
             this.gb_Chuk.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ch_x_axis)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ch_y_axis)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ch_z_axis)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -364,6 +498,14 @@
         private System.Windows.Forms.Label lblBattery;
         private System.Windows.Forms.Label lblDevicePath;
         private System.Windows.Forms.CheckBox chkExtension;
+        private System.Windows.Forms.DataVisualization.Charting.Chart ch_x_axis;
+        private System.Windows.Forms.DataVisualization.Charting.Chart ch_y_axis;
+        private System.Windows.Forms.DataVisualization.Charting.Chart ch_z_axis;
+        private System.Windows.Forms.CheckBox chkNGraph;
+        private System.Windows.Forms.CheckBox chkGraph;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
     }
 }
 

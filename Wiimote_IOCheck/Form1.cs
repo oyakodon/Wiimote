@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using WiimoteLib;
 
 namespace Wiimote_IOCheck
@@ -9,10 +11,15 @@ namespace Wiimote_IOCheck
         private Wiimote mWiimote;
         private delegate void UpdateWiimoteStateDelegate(WiimoteChangedEventArgs args);
         private delegate void UpdateExtensionChangedDelegate(WiimoteExtensionChangedEventArgs args);
+        private List<Queue<float>> axis_history = new List<Queue<float>>();　// 加速度の履歴(グラフの点)
+        private bool showGraph = false;　// グラフを表示するか
+        private bool showNGraph = false; // ヌンチャクのグラフを表示するか
 
         public Form1()
         {
             InitializeComponent();
+
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -21,6 +28,7 @@ namespace Wiimote_IOCheck
 
             try
             {
+                // Wiiリモコンへの接続
                 mWiimote.WiimoteChanged += (s, args) => UpdateState(args);
                 mWiimote.WiimoteExtensionChanged += (s, args) => UpdateExtension(args);
                 mWiimote.Connect();
@@ -41,8 +49,11 @@ namespace Wiimote_IOCheck
                 MessageBox.Show(ex.Message, "Unknown error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-        }
+            //　初期化
+            for(int i = 0; i < 3; i++) axis_history.Add(new Queue<float>());
 
+            this.Size = new System.Drawing.Size(560, 400);
+        }
 
         public void UpdateState(WiimoteChangedEventArgs args)
         {
@@ -68,8 +79,15 @@ namespace Wiimote_IOCheck
         {
             WiimoteState ws = args.WiimoteState;
 
-            // GUI IOCheck
-            #region GUIIOCheck
+            // グラフへの描画 (ヌンチャクのチェック無し)
+            if (showGraph && !showNGraph)
+            {
+                    showChart(ch_x_axis, axis_history[0], ws.AccelState.Values.X * 100);
+                    showChart(ch_y_axis, axis_history[1], ws.AccelState.Values.Y * 100);
+                    showChart(ch_z_axis, axis_history[2], ws.AccelState.Values.Z * 100);
+            }
+
+            // ボタンの状態
             clbButtons.SetItemChecked(0, ws.ButtonState.A);
             clbButtons.SetItemChecked(1, ws.ButtonState.B);
             clbButtons.SetItemChecked(2, ws.ButtonState.Minus);
@@ -82,23 +100,39 @@ namespace Wiimote_IOCheck
             clbButtons.SetItemChecked(9, ws.ButtonState.Left);
             clbButtons.SetItemChecked(10, ws.ButtonState.Right);
 
+            // リモコンの加速度
             lblAccel.Text = ws.AccelState.Values.ToString();
 
+            // LEDの状態
             chkLED1.Checked = ws.LEDState.LED1;
             chkLED2.Checked = ws.LEDState.LED2;
             chkLED3.Checked = ws.LEDState.LED3;
             chkLED4.Checked = ws.LEDState.LED4;
 
+            // 接続されているアクセサリで分岐
             switch (ws.ExtensionType)
             {
+                // ヌンチャク
                 case ExtensionType.Nunchuk:
+                    // グラフへの描画 (ヌンチャクのチェック有り)
+                    if (showGraph && showNGraph)
+                    {
+                        showChart(ch_x_axis, axis_history[0], ws.NunchukState.AccelState.Values.X * 100);
+                        showChart(ch_y_axis, axis_history[1], ws.NunchukState.AccelState.Values.Y * 100);
+                        showChart(ch_z_axis, axis_history[2], ws.NunchukState.AccelState.Values.Z * 100);
+                    }
+                    // 加速度センサとジョイスティック
                     lblChuk.Text = ws.NunchukState.AccelState.Values.ToString();
                     lblChukJoy.Text = ws.NunchukState.Joystick.ToString();
+
+                    // ボタン
                     chkC.Checked = ws.NunchukState.C;
                     chkZ.Checked = ws.NunchukState.Z;
                     break;
 
+                // Wii バランスボード
                 case ExtensionType.BalanceBoard:
+                    // 重さ
                     if (chkLbs.Checked)
                     {
                         lblBBTL.Text = ws.BalanceBoardState.SensorValuesLb.TopLeft.ToString();
@@ -114,15 +148,17 @@ namespace Wiimote_IOCheck
                         lblBBBR.Text = ws.BalanceBoardState.SensorValuesKg.BottomRight.ToString();
                         lblBBTotal.Text = ws.BalanceBoardState.WeightKg.ToString();
                     }
+                    // 中央の重力
                     lblCOG.Text = ws.BalanceBoardState.CenterOfGravity.ToString();
                     break;
             }
 
+            // 電池残量
             pbBattery.Value = (ws.Battery > 0xc8 ? 0xc8 : (int)ws.Battery);
             lblBattery.Text = ws.Battery.ToString();
-            lblDevicePath.Text = "Device Path: " + mWiimote.HIDDevicePath;
-#endregion
 
+            // デバイスパス
+            lblDevicePath.Text = "Device Path: " + mWiimote.HIDDevicePath;
         }
 
         private void UpdateExtensionChanged(WiimoteExtensionChangedEventArgs args)
@@ -139,6 +175,48 @@ namespace Wiimote_IOCheck
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             mWiimote.Disconnect();
+        }
+
+        private void showChart(Chart chart, Queue<float> q, float v)
+        {
+            // グラフへの描画
+            q.Enqueue(v);
+
+            // 200個以上のデータは削除
+            while (q.Count > 200)
+            {
+                q.Dequeue();
+            }
+
+            // 表上の点を全て削除
+            chart.Series[0].Points.Clear();
+            foreach (int value in q)
+            {
+                // 点の追加
+                chart.Series[0].Points.Add(new DataPoint(0, value));
+            }
+        }
+
+        private void chkNGraph_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkNGraph.Checked) {
+                // ヌンチャクがチェックされた
+                chkGraph.Checked = true;
+                showGraph = true;
+                showNGraph = true;
+            } else
+            {
+                // チャック外された
+                showNGraph = false;
+
+            }
+        }
+
+        private void chkGraph_CheckedChanged(object sender, EventArgs e)
+        {
+            showGraph = chkGraph.Checked;
+            if (showGraph) this.Size = new System.Drawing.Size(1090, 773);
+            else this.Size = new System.Drawing.Size(560, 400);
         }
     }
 }

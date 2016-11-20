@@ -12,20 +12,20 @@ namespace Wiimote_Mouse
         private delegate void UpdateWiimoteStateDelegate(WiimoteChangedEventArgs args);
         private delegate void UpdateExtensionChangedDelegate(WiimoteExtensionChangedEventArgs args);
 
-        private System.Drawing.Point MaxXY;
-        private System.Drawing.Point MinXY;
-        private System.Drawing.Point CursorPoint;
-        private bool wmMouseActivated = false;
-        private int mouseSpeed = 25;
-        private WiimoteLib.ButtonState previousBtns;
-        private string batteryStat = "- %";
-        private List<Bitmap> lamps = new List<Bitmap>();
+        private System.Drawing.Point MaxXY; // ディスプレイのX,Y最大値
+        private System.Drawing.Point MinXY; // ディスプレイのX,Y最小値
+        private System.Drawing.Point CursorPoint; // カーソル位置
+        private bool wmMouseActivated = false; // マウスの移動の有効/無効
+        private int mouseSpeed = 25; // マウス速度
+        private WiimoteLib.ButtonState previousBtns; // 直前のボタンの状態
+        private string batteryStat = "- %"; // バッテリー状態
+        private List<Bitmap> lamps = new List<Bitmap>(); // ステータスランプ
 
         public Form1()
         {
             InitializeComponent();
 
-            this.FormBorderStyle = FormBorderStyle.Fixed3D;
+            this.FormBorderStyle = FormBorderStyle.Fixed3D; // ウィンドウの大きさを変更させない
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -62,7 +62,7 @@ namespace Wiimote_Mouse
             CursorPoint = Cursor.Position;
             notifyIcon1.Text = "Wiimote Mouse : Disabled";
 
-            // Wiimote初期化
+            // Wiimote接続
             mWiimote = new Wiimote();
 
             try
@@ -126,14 +126,14 @@ namespace Wiimote_Mouse
             }
 
             // Aボタン (プレス)
-            if ( !previousBtns.A && ws.ButtonState.A && wmMouseActivated )
+            if ( !previousBtns.A && ws.ButtonState.A )
             {
                 // マウス左クリック
                 WinAPI.mouse_event(WinAPI.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
             }
 
             // Aボタン (リリース)
-            if ( previousBtns.A && !ws.ButtonState.A && wmMouseActivated )
+            if ( previousBtns.A && !ws.ButtonState.A )
             {
                 // マウス左クリック
                 WinAPI.mouse_event(WinAPI.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
@@ -182,14 +182,14 @@ namespace Wiimote_Mouse
             }
 
             // ↓ボタン (プレス)
-            if (!previousBtns.Down && ws.ButtonState.Down && wmMouseActivated)
+            if (!previousBtns.Down && ws.ButtonState.Down)
             {
                 // マウス右クリック
                 WinAPI.mouse_event(WinAPI.MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
             }
 
             // ↓ボタン (リリース)
-            if (previousBtns.Down && !ws.ButtonState.Down && wmMouseActivated)
+            if (previousBtns.Down && !ws.ButtonState.Down)
             {
                 // マウス右クリック
                 WinAPI.mouse_event(WinAPI.MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
@@ -214,6 +214,7 @@ namespace Wiimote_Mouse
             previousBtns = ws.ButtonState;
             #endregion
 
+            // バッテリー残量
             pbBattery.Value = (ws.Battery > 0xc8 ? 0xc8 : (int)ws.Battery);
             batteryStat = pbBattery.Value.ToString() + "%";
             lblBattery.Text = batteryStat;
@@ -230,12 +231,14 @@ namespace Wiimote_Mouse
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // 閉じられたら
             mWiimote.SetLEDs(false, false, false, false);
             mWiimote.Disconnect();
         }
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            // 通知アイコンがダブルクリックされたら
             this.Visible = true;
             this.ShowInTaskbar = true;
             this.WindowState = FormWindowState.Normal;
@@ -244,6 +247,7 @@ namespace Wiimote_Mouse
 
         private void Form1_Resize(object sender, EventArgs e)
         {
+            // 最小化されたら
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.Visible = false;
