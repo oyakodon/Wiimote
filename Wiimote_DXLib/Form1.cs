@@ -15,7 +15,7 @@ namespace Wiimote_DXLib
         private WiimoteLib.ButtonState previousBtns; // 直前のボタンの状態
         private bool wmActivated = false; // 移動有効/無効
         private float speed = 4.0f; // 視点移動速度
-        private const string mmdPath = "Yukari/結月ゆかり_純_ver1.0.pmd"; // MMDファイル(pmx,pmd...)のパス (exeからの)
+        private const string mmdPath = "Pronama/プロ生ちゃん.pmx"; // MMDファイル(pmx,pmd...)のパス (exeからの)
         static int hDebug_font; // デバッグ用フォントのハンドル
 
         private　DX.VECTOR Model; // モデルの位置
@@ -25,7 +25,7 @@ namespace Wiimote_DXLib
         public Form1()
         {
             InitializeComponent();
-
+            
             // DXライブラリ と Windowsフォームの連携
             this.Text = "Wiimote MMD";
             this.ClientSize = new Size(640, 480);
