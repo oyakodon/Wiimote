@@ -67,6 +67,11 @@ namespace Wiimote_Mouse
             // Bluetooth
             btu = new BTUtil();
             btu.ShowDialog();
+            System.Threading.Thread.Sleep(2000);
+            if (btu.userClosed)
+            {
+                Environment.Exit(0);
+            }
         }
 
         // ------------------------------------------------------------------------------------------
@@ -104,17 +109,17 @@ namespace Wiimote_Mouse
             catch (WiimoteNotFoundException ex)
             {
                 MessageBox.Show(ex.Message, "Wiimote not found error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                Environment.Exit(1);
             }
             catch (WiimoteException ex)
             {
                 MessageBox.Show(ex.Message, "Wiimote error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                Environment.Exit(1);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Unknown error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                Environment.Exit(1);
             }
 
 #if !DEBUG
@@ -126,8 +131,15 @@ namespace Wiimote_Mouse
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             // 閉じられたら
+            this.Text = "Wiimote Mouse - 終了処理中...";
+
             mWiimote.SetLEDs(false, false, false, false);
             mWiimote.Disconnect();
+            System.Threading.Thread.Sleep(3000);
+            Application.DoEvents();
+            btu = new BTUtil();
+            btu.disconnectWiimote();
+            Application.DoEvents();
         }
 
         private void Form1_Resize(object sender, EventArgs e)

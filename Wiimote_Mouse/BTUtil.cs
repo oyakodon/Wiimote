@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 using static Wiimote_Mouse.BTApi;
 
 
@@ -16,9 +17,30 @@ namespace Wiimote_Mouse
             InitializeComponent();
 
             bgWorker_devSearch = new BackgroundWorker();
+            bgWorker_devSearch.WorkerSupportsCancellation = true;
             bgWorker_devSearch.DoWork += bgWorker_devSearch_DoWork;
 
             radio_search();
+        }
+
+        public void disconnectWiimote()
+        {
+            refresh_list();
+            System.Threading.Thread.Sleep(100);
+            Application.DoEvents();
+            lock (btdis)
+            {
+                BLUETOOTH_DEVICE_INFO btdi;
+                for (int i = 0; i < btdis.Count; i++)
+                {
+                    btdi = btdis[i];
+                    if (btdi.szName.StartsWith("Nintendo"))
+                    {
+                        if (btdi.fConnected) wii_disconnect(btdi);
+                    }
+                }
+            }
+
         }
 
         // Properties
@@ -26,6 +48,9 @@ namespace Wiimote_Mouse
         private IntPtr hradio = IntPtr.Zero;
         private BLUETOOTH_RADIO_INFO rinfo = new BLUETOOTH_RADIO_INFO();
         private List<BLUETOOTH_DEVICE_INFO> btdis = new List<BLUETOOTH_DEVICE_INFO>();
+        public bool userClosed = false;
+        private bool invokeClosed = false;
+        private bool doPair = false;
 
         /// <summary>
         /// Wiiリモコンとペアリングします。
@@ -161,6 +186,9 @@ namespace Wiimote_Mouse
         /// </summary>
         private unsafe void bgWorker_devSearch_DoWork(object sender, DoWorkEventArgs e)
         {
+            var worker = sender as BackgroundWorker;
+            var broken = false;
+
             while (true)
             {
                 // 探索開始
@@ -173,23 +201,38 @@ namespace Wiimote_Mouse
                     for (int i = 0; i < btdis.Count; i++)
                     {
                         btdi = btdis[i];
-                        if (btdi.szName.Contains("RVL-CNT-01"))
+                        Debug.WriteLine("{0} : {1}", btdi.szName, doPair);
+
+                        if (btdi.szName.StartsWith("Nintendo"))
                         {
+                            if (worker.CancellationPending)
+                            {
+                                e.Cancel = true;
+                                bgWorker_devSearch.CancelAsync();
+                                broken = true;
+                                break;
+                            }
+
                             if (btdi.fConnected)
                             {
                                 // 接続完了
-                                this.Invoke((MethodInvoker)delegate () { this.Close(); });
+                                bgClose();
                             }
 
-                            if (!btdi.fRemembered && !btdi.fAuthenticated && !btdi.fConnected)
+                            if (doPair || (!btdi.fRemembered && !btdi.fAuthenticated && !btdi.fConnected))
                             {
                                 // Wiiリモコンとのペアリング
+                                Debug.WriteLine("Do Pairing.");
+                                doPair = false;
                                 System.Threading.Thread.Sleep(1000);
                                 wii_pairing(btdi);
-
+                                System.Threading.Thread.Sleep(1000);
+                                bgClose();
                             }
                         }
                     }
+
+                    if (broken) break;
                 }
 
                 System.Threading.Thread.Sleep(2000);
@@ -200,37 +243,90 @@ namespace Wiimote_Mouse
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             lblStat.Text = "Connecting...";
-            pairToolStripMenuItem.Enabled = connectToolStripMenuItem.Enabled = false;
+            removeToolStripMenuItem.Enabled = pairToolStripMenuItem.Enabled = connectToolStripMenuItem.Enabled = false;
             btnCancel.Enabled = true;
 
-            bgWorker_devSearch.RunWorkerAsync();
+            if (!bgWorker_devSearch.IsBusy)
+                bgWorker_devSearch.RunWorkerAsync();
         }
 
         private void pairToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            doPair = true;
             lblStat.Text = "Pairing...";
-            connectToolStripMenuItem.Enabled = pairToolStripMenuItem.Enabled = false;
+            removeToolStripMenuItem.Enabled = connectToolStripMenuItem.Enabled = pairToolStripMenuItem.Enabled = false;
             btnCancel.Enabled = true;
 
             MessageBox.Show("Press and release the SYNC button just below the batteries on the Wii Remote.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            bgWorker_devSearch.RunWorkerAsync();
+            if (!bgWorker_devSearch.IsBusy)
+                bgWorker_devSearch.RunWorkerAsync();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
             lblStat.Text = "...";
             btnCancel.Enabled = false;
-            connectToolStripMenuItem.Enabled = pairToolStripMenuItem.Enabled = true;
-
-            bgWorker_devSearch.Dispose();
-            bgWorker_devSearch = new BackgroundWorker();
-            bgWorker_devSearch.DoWork += bgWorker_devSearch_DoWork;
+            removeToolStripMenuItem.Enabled = connectToolStripMenuItem.Enabled = pairToolStripMenuItem.Enabled = true;
+            bgWorker_devSearch.CancelAsync();
 
         }
 
         private void BTUtil_Shown(object sender, EventArgs e)
         {
             connectToolStripMenuItem.PerformClick();
+        }
+
+        private void BTUtil_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            bgWorker_devSearch.CancelAsync();
+        }
+
+        private void BTUtil_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (!invokeClosed)
+                userClosed = true;
+        }
+
+        private void removeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            btnCancel.Enabled = false;
+            connectToolStripMenuItem.Enabled = pairToolStripMenuItem.Enabled = true;
+            removeToolStripMenuItem.Enabled = false;
+            lblStat.Text = "...";
+            bgWorker_devSearch.CancelAsync();
+
+            refresh_list();
+            System.Threading.Thread.Sleep(100);
+            Application.DoEvents();
+            lock (btdis)
+            {
+                BLUETOOTH_DEVICE_INFO btdi;
+                for (int i = 0; i < btdis.Count; i++)
+                {
+                    btdi = btdis[i];
+                    if (btdi.szName.StartsWith("Nintendo"))
+                    {
+                        if (btdi.fConnected) wii_remove(btdi);
+                    }
+                }
+            }
+            MessageBox.Show("Wiimote device successfully removed in this PC.");
+        }
+
+        delegate void bgCloseCallback();
+
+        private void bgClose()
+        {
+            invokeClosed = true;
+
+            if (this.InvokeRequired)
+            {
+                bgCloseCallback d = new bgCloseCallback(bgClose);
+                this.Invoke(d);
+            } else
+            {
+                this.Close();
+            }
         }
     }
 }

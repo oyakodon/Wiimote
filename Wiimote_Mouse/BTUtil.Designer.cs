@@ -34,6 +34,7 @@
             this.bluetoothToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnCancel = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -61,7 +62,8 @@
             // 
             this.bluetoothToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.connectToolStripMenuItem,
-            this.pairToolStripMenuItem});
+            this.pairToolStripMenuItem,
+            this.removeToolStripMenuItem});
             this.bluetoothToolStripMenuItem.Name = "bluetoothToolStripMenuItem";
             this.bluetoothToolStripMenuItem.Size = new System.Drawing.Size(86, 20);
             this.bluetoothToolStripMenuItem.Text = "Bluetooth(&B)";
@@ -79,6 +81,13 @@
             this.pairToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.pairToolStripMenuItem.Text = "Pair";
             this.pairToolStripMenuItem.Click += new System.EventHandler(this.pairToolStripMenuItem_Click);
+            // 
+            // removeToolStripMenuItem
+            // 
+            this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.removeToolStripMenuItem.Text = "Remove";
+            this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
             // 
             // btnCancel
             // 
@@ -100,7 +109,10 @@
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "BTUtil";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BTUtil_FormClosed);
             this.Shown += new System.EventHandler(this.BTUtil_Shown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -117,5 +129,6 @@
         private System.Windows.Forms.ToolStripMenuItem pairToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem connectToolStripMenuItem;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.ToolStripMenuItem removeToolStripMenuItem;
     }
 }

@@ -43,6 +43,23 @@ namespace Wiimote_AutoPair
                         }
                         wiimoteConnected = false;
                         break;
+                    case 'r':
+                        refresh_list();
+                        System.Threading.Thread.Sleep(100);
+                        lock (btdis)
+                        {
+                            BLUETOOTH_DEVICE_INFO btdi;
+                            for (int i = 0; i < btdis.Count; i++)
+                            {
+                                btdi = btdis[i];
+                                if (btdi.szName.Contains("RVL-CNT-01"))
+                                {
+                                    wii_remove(btdi);
+                                }
+                            }
+                        }
+                        wiimoteConnected = false;
+                        break;
                     case 'l':
                         showDevices = true;
                         break;
