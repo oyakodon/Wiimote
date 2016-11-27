@@ -121,11 +121,6 @@ namespace Wiimote_Mouse
                 MessageBox.Show(ex.Message, "Unknown error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(1);
             }
-
-#if !DEBUG
-            this.WindowState = FormWindowState.Minimized;
-#endif
-
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -331,6 +326,7 @@ namespace Wiimote_Mouse
             {
                 if (easterEgg)
                 {
+                    this.Text = "Wiimote Mouse";
                     easterEgg = false;
                     wmMouseActivated = joyMouseActivated = false;
                     mWiimote.SetLEDs(true, false, false, true);
@@ -338,6 +334,7 @@ namespace Wiimote_Mouse
                 {
                     // 裏モード開始
                     Debug.WriteLine("EasterEgg Mode");
+                    this.Text = "Wiimote Mouse - EasterEgg";
                     easterEgg = true;
                     wmMouseActivated = joyMouseActivated = false;
                 }
@@ -380,6 +377,14 @@ namespace Wiimote_Mouse
                 case ExtensionType.Nunchuk:
                     // ヌンチャク刺さってるンゴ -> スティックでマウスカーソル移動
                     var joy = ws.NunchukState.Joystick;
+
+                    if (previousNunchuk.C && !ws.NunchukState.C)
+                    {
+                        // マウスカーソルを画面の真ん中に
+                        var s = Screen.FromPoint(Cursor.Position);
+                        CursorPoint = new System.Drawing.Point(s.Bounds.X + s.Bounds.Width / 2, s.Bounds.Y + s.Bounds.Height / 2);
+                        Cursor.Position = CursorPoint;
+                    }
 
                     if (previousNunchuk.Z && !ws.NunchukState.Z)
                     {
@@ -443,30 +448,17 @@ namespace Wiimote_Mouse
             }
 
             // ↑ボタン
-            if (previousBtns.Up && !ws.ButtonState.Up)
+            if (ws.ButtonState.Up)
             {
-                // Windowsキー
-                SendKeys.Send("^{ESC}");
+                // マウスホイール　上
+                WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, 100, 0);
             }
 
             // ↓ボタン
-            if (previousBtns.Down && !ws.ButtonState.Down)
+            if (ws.ButtonState.Down)
             {
-                // マウス有効化設定
-                wmMouseActivated = !wmMouseActivated;
-                if (wmMouseActivated)
-                {
-                    joyMouseActivated = false;
-                    mWiimote.SetLEDs(true, true, true, true);
-                    notifyIcon1.Text = "Wiimote Mouse : Enabled";
-                } else
-                {
-                    mWiimote.SetLEDs(true, false, false, true);
-                    notifyIcon1.Text = "Wiimote Mouse : Disabled";
-                }
-
-                motionMouseToolStripMenuItem.Checked = wmMouseActivated;
-                nunchuckMouseToolStripMenuItem.Checked = joyMouseActivated;
+                // マウスホイール　下
+                WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, -100, 0);
             }
 
             // →ボタン
@@ -485,8 +477,15 @@ namespace Wiimote_Mouse
                 device.AudioEndpointVolume.MasterVolumeLevelScalar -= vol >= 0.01f ? 0.01f : vol;
 
             }
-
+            
+            // 1ボタン
             if (previousBtns.One && !ws.ButtonState.One)
+            {
+                // Windowsキー
+                SendKeys.Send("^{ESC}");
+            }
+
+            if (previousBtns.Two && !ws.ButtonState.Two)
             {
                 // ミュート
                 device.AudioEndpointVolume.Mute = !device.AudioEndpointVolume.Mute;
@@ -495,10 +494,21 @@ namespace Wiimote_Mouse
             // Homeボタン
             if (previousBtns.Home && !ws.ButtonState.Home)
             {
-                // マウスカーソルを画面の真ん中に
-                var s = Screen.FromPoint(Cursor.Position);
-                CursorPoint = new System.Drawing.Point(s.Bounds.X + s.Bounds.Width / 2, s.Bounds.Y + s.Bounds.Height / 2);
-                Cursor.Position = CursorPoint;
+                // マウス有効化設定
+                wmMouseActivated = !wmMouseActivated;
+                if (wmMouseActivated)
+                {
+                    joyMouseActivated = false;
+                    mWiimote.SetLEDs(true, true, true, true);
+                    notifyIcon1.Text = "Wiimote Mouse : Enabled";
+                } else
+                {
+                    mWiimote.SetLEDs(true, false, false, true);
+                    notifyIcon1.Text = "Wiimote Mouse : Disabled";
+                }
+
+                motionMouseToolStripMenuItem.Checked = wmMouseActivated;
+                nunchuckMouseToolStripMenuItem.Checked = joyMouseActivated;
             }
 
         }
