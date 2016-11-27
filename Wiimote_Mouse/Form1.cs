@@ -40,6 +40,8 @@ namespace Wiimote_Mouse
         private Queue<string> Log = new Queue<string>(); // ボタン押下ログ
         private bool dialogShowing = false; // ダイアログ表示中
 
+        private bool volChanged = false; // 2ボタンを押しながら音量が変更されたかどうか
+
         private BTUtil btu; // Bluetooth
         #endregion
 
@@ -126,7 +128,8 @@ namespace Wiimote_Mouse
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             // 閉じられたら
-            this.Text = "Wiimote Mouse - 終了処理中...";
+            this.Text = "Wiimote Mouse - Closing...";
+            this.notifyIcon1.Text = "Wiimote Mouse - Closing...";
 
             mWiimote.SetLEDs(false, false, false, false);
             mWiimote.Disconnect();
@@ -198,7 +201,7 @@ namespace Wiimote_Mouse
 #if DEBUG
                 statLblVol.Text = (float)(data.MasterVolume * 100) + "%";
 #else
-            statLblVol.Text = (int)(data.MasterVolume * 100) + "%";
+                statLblVol.Text = (int)(data.MasterVolume * 100) + "%";
 #endif
             }
         }
@@ -247,27 +250,10 @@ namespace Wiimote_Mouse
                         }
                         Debug.WriteLine(com);
 
-                        if (com == "A")
-                        {
-                            // Aボタンでメインウィンドウの表示
-                            this.Visible = true;
-                            this.ShowInTaskbar = true;
-                            this.WindowState = FormWindowState.Normal;
-                            this.Activate();
-                        }
-
-                        if (com == "B")
-                        {
-                            // Bボタンでメインウィンドウをトレーに格納
-                            this.Visible = false;
-                            this.ShowInTaskbar = false;
-                            this.WindowState = FormWindowState.Minimized;
-                        }
-
                         if (com.Contains("UpUpDownDownLeftRightLeftRightBA") && !dialogShowing)
                         {
                             dialogShowing = true;
-                            MessageBox.Show("コナミコマンド！");
+                            MessageBox.Show("KONMAI", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             dialogShowing = false;
                         }
 
@@ -380,14 +366,6 @@ namespace Wiimote_Mouse
 
                     if (previousNunchuk.C && !ws.NunchukState.C)
                     {
-                        // マウスカーソルを画面の真ん中に
-                        var s = Screen.FromPoint(Cursor.Position);
-                        CursorPoint = new System.Drawing.Point(s.Bounds.X + s.Bounds.Width / 2, s.Bounds.Y + s.Bounds.Height / 2);
-                        Cursor.Position = CursorPoint;
-                    }
-
-                    if (previousNunchuk.Z && !ws.NunchukState.Z)
-                    {
                         wmMouseActivated = false;
                         joyMouseActivated = !joyMouseActivated;
                         motionMouseToolStripMenuItem.Checked = wmMouseActivated;
@@ -396,8 +374,15 @@ namespace Wiimote_Mouse
 
                     if (joyMouseActivated && !wmMouseActivated)
                     {
-                        if (Math.Abs(joy.X) >= 0.15) MoveCursor(joy.X, 0);
-                        if (Math.Abs(joy.Y) >= 0.15) MoveCursor(0, -joy.Y);
+                        if (ws.NunchukState.Z)
+                        {
+                            if (Math.Abs(joy.Y) >= 0.15)
+                                WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, (int)(100 * joy.Y), 0);
+                        } else
+                        {
+                            if (Math.Abs(joy.X) >= 0.15) MoveCursor(joy.X, 0);
+                            if (Math.Abs(joy.Y) >= 0.15) MoveCursor(0, -joy.Y);
+                        }
                     }
 
                     previousNunchuk = ws.NunchukState;
@@ -448,36 +433,65 @@ namespace Wiimote_Mouse
             }
 
             // ↑ボタン
-            if (ws.ButtonState.Up)
+            if (ws.ButtonState.Up && !ws.ButtonState.Two)
             {
                 // マウスホイール　上
-                WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, 100, 0);
+                WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, 65, 0);
+            }
+
+            if (previousBtns.Up && !ws.ButtonState.Up && ws.ButtonState.Two)
+            {
+                // 音量+
+                volChanged = true;
+                var vol = device.AudioEndpointVolume.MasterVolumeLevelScalar;
+                device.AudioEndpointVolume.MasterVolumeLevelScalar += vol <= 1.0f - 0.05f ? 0.05f : 1.0f - vol;
             }
 
             // ↓ボタン
-            if (ws.ButtonState.Down)
+            if (ws.ButtonState.Down && ws.ButtonState.Two)
             {
                 // マウスホイール　下
-                WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, -100, 0);
+                WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, -65, 0);
+            }
+
+            if (previousBtns.Down && !ws.ButtonState.Down && ws.ButtonState.Two)
+            {
+                // 音量-
+                volChanged = true;
+                var vol = device.AudioEndpointVolume.MasterVolumeLevelScalar;
+                device.AudioEndpointVolume.MasterVolumeLevelScalar -= vol >= 0.05f ? 0.05f : vol;
             }
 
             // →ボタン
-            if (ws.ButtonState.Right)
+            if (previousBtns.Right && !ws.ButtonState.Right)
             {
-                // 音量+
-                var vol = device.AudioEndpointVolume.MasterVolumeLevelScalar;
-                device.AudioEndpointVolume.MasterVolumeLevelScalar += vol <= 1.0f - 0.01f ? 0.01f : 1.0f - vol;
+                // マウスカーソルを画面の真ん中に
+                var s = Screen.FromPoint(Cursor.Position);
+                CursorPoint = new System.Drawing.Point(s.Bounds.X + s.Bounds.Width / 2, s.Bounds.Y + s.Bounds.Height / 2);
+                Cursor.Position = CursorPoint;
             }
 
             // ←ボタン
-            if (ws.ButtonState.Left)
+            if (previousBtns.Left && !ws.ButtonState.Left)
             {
-                // 音量-
-                var vol = device.AudioEndpointVolume.MasterVolumeLevelScalar;
-                device.AudioEndpointVolume.MasterVolumeLevelScalar -= vol >= 0.01f ? 0.01f : vol;
+                // ウィンドウの表示・非表示
+                if (this.Visible)
+                {
+                    // トレーに格納
+                    this.Visible = false;
+                    this.ShowInTaskbar = false;
+                    this.WindowState = FormWindowState.Minimized;
+                } else
+                {
+                    // 表示
+                    this.Visible = true;
+                    this.ShowInTaskbar = true;
+                    this.WindowState = FormWindowState.Normal;
+                    this.Activate();
+                }
 
             }
-            
+
             // 1ボタン
             if (previousBtns.One && !ws.ButtonState.One)
             {
@@ -487,8 +501,12 @@ namespace Wiimote_Mouse
 
             if (previousBtns.Two && !ws.ButtonState.Two)
             {
-                // ミュート
-                device.AudioEndpointVolume.Mute = !device.AudioEndpointVolume.Mute;
+                if (!volChanged)
+                {
+                    // ミュート
+                    device.AudioEndpointVolume.Mute = !device.AudioEndpointVolume.Mute;
+                }
+                volChanged = false;
             }
 
             // Homeボタン
