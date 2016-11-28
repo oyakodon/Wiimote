@@ -448,7 +448,7 @@ namespace Wiimote_Mouse
             }
 
             // ↓ボタン
-            if (ws.ButtonState.Down && ws.ButtonState.Two)
+            if (ws.ButtonState.Down && !ws.ButtonState.Two)
             {
                 // マウスホイール　下
                 WinAPI.mouse_event(WinAPI.MOUSEEVENTF_WHEEL, 0, 0, -65, 0);
