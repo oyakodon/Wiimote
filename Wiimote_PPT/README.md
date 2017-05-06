@@ -1,6 +1,7 @@
 # Wiimote PPT
-WiiリモコンでPowerPointのスライドショーを操作します。
 ![Wiimote PPT Icon](https://raw.githubusercontent.com/oyakodon/Wiimote/master/Wiimote_PPT/Images/wiimote_ppt.png)
+  
+WiiリモコンでPowerPointのスライドショーを操作します。
 
 ## How to use
 - Aボタン: 次のスライドへ(→)
