@@ -34,13 +34,14 @@
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.終了QToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.boxStatus = new System.Windows.Forms.TextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.boxLog = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.ファイルFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.終了QToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.終了時に切断ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.終了QToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.ディスプレイToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -60,12 +61,12 @@
             this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.終了QToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(118, 26);
+            this.contextMenuStrip.Size = new System.Drawing.Size(116, 26);
             // 
             // 終了QToolStripMenuItem
             // 
             this.終了QToolStripMenuItem.Name = "終了QToolStripMenuItem";
-            this.終了QToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+            this.終了QToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.終了QToolStripMenuItem.Text = "終了(&Q)";
             this.終了QToolStripMenuItem.Click += new System.EventHandler(this.終了QToolStripMenuItem_Click);
             // 
@@ -79,16 +80,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Status";
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.boxLog);
-            this.groupBox2.Location = new System.Drawing.Point(207, 29);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(190, 110);
-            this.groupBox2.TabIndex = 3;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Log";
-            // 
             // boxStatus
             // 
             this.boxStatus.Location = new System.Drawing.Point(6, 18);
@@ -98,6 +89,16 @@
             this.boxStatus.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.boxStatus.Size = new System.Drawing.Size(178, 86);
             this.boxStatus.TabIndex = 2;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.boxLog);
+            this.groupBox2.Location = new System.Drawing.Point(207, 29);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(190, 110);
+            this.groupBox2.TabIndex = 3;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Log";
             // 
             // boxLog
             // 
@@ -112,7 +113,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ファイルFToolStripMenuItem});
+            this.ファイルFToolStripMenuItem,
+            this.ディスプレイToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(409, 24);
@@ -125,8 +127,15 @@
             this.終了時に切断ToolStripMenuItem,
             this.終了QToolStripMenuItem1});
             this.ファイルFToolStripMenuItem.Name = "ファイルFToolStripMenuItem";
-            this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
+            this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(67, 20);
             this.ファイルFToolStripMenuItem.Text = "ファイル(&F)";
+            // 
+            // 終了時に切断ToolStripMenuItem
+            // 
+            this.終了時に切断ToolStripMenuItem.CheckOnClick = true;
+            this.終了時に切断ToolStripMenuItem.Name = "終了時に切断ToolStripMenuItem";
+            this.終了時に切断ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.終了時に切断ToolStripMenuItem.Text = "終了時に切断";
             // 
             // 終了QToolStripMenuItem1
             // 
@@ -135,12 +144,11 @@
             this.終了QToolStripMenuItem1.Text = "終了(&Q)";
             this.終了QToolStripMenuItem1.Click += new System.EventHandler(this.終了QToolStripMenuItem_Click);
             // 
-            // 終了時に切断ToolStripMenuItem
+            // ディスプレイToolStripMenuItem
             // 
-            this.終了時に切断ToolStripMenuItem.CheckOnClick = true;
-            this.終了時に切断ToolStripMenuItem.Name = "終了時に切断ToolStripMenuItem";
-            this.終了時に切断ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.終了時に切断ToolStripMenuItem.Text = "終了時に切断";
+            this.ディスプレイToolStripMenuItem.Name = "ディスプレイToolStripMenuItem";
+            this.ディスプレイToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
+            this.ディスプレイToolStripMenuItem.Text = "ディスプレイ";
             // 
             // Form1
             // 
@@ -184,6 +192,7 @@
         private System.Windows.Forms.ToolStripMenuItem ファイルFToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 終了QToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem 終了時に切断ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ディスプレイToolStripMenuItem;
     }
 }
 

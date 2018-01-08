@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Windows.Forms;
 
 using WiimoteLib;
+using System.Collections.Generic;
 
 namespace Wiimote_PPT
 {
@@ -17,18 +19,30 @@ namespace Wiimote_PPT
         private void Form1_Load(object sender, EventArgs e)
         {
             // スクリーンの大きさ取得
-            foreach (var s in Screen.AllScreens)
+            var menuDisplays = new List<ToolStripMenuItem>();
+            for(var i = 0; i < Screen.AllScreens.Length; i++)
             {
-                if (s.Bounds.X < 0) MinXY.X += s.Bounds.X;
-                if (s.Bounds.Y < 0) MinXY.Y += s.Bounds.Y;
-                if (s.Bounds.X > 0) MaxXY.X += s.Bounds.X;
-                if (s.Bounds.Y > 0) MaxXY.Y += s.Bounds.Y;
-            }
-            MaxXY.X += Screen.PrimaryScreen.Bounds.Width;
-            MaxXY.Y += Screen.PrimaryScreen.Bounds.Height;
+                var scr = Screen.AllScreens[i];
+                screenSizes.Add(scr.Bounds);
+                var menuDisp = new ToolStripMenuItem();
+                menuDisplays.Add(menuDisp);
+                menuDisp.Text = "ディスプレイ" + (i + 1);
+                int num = i;
 
-            // カーソルの取得
-            Pt = Cursor.Position;
+                menuDisp.Click += (s2, e2) =>
+                {
+                    foreach (var item in menuDisplays)
+                    {
+                        item.CheckState = object.ReferenceEquals(item, s2) ? CheckState.Indeterminate : CheckState.Unchecked;
+                    }
+
+                    selectedDisp = num;
+                };
+
+                ディスプレイToolStripMenuItem.DropDownItems.Add(menuDisp);
+            }
+
+            menuDisplays[0].PerformClick();
 
             ConnectWiimote();
             AddLog("起動しました。 " + DateTime.Now.ToString());
@@ -39,10 +53,9 @@ namespace Wiimote_PPT
         private delegate void UpdateExtensionChangedDelegate(WiimoteExtensionChangedEventArgs args);
         private WiimoteLib.ButtonState previousBtns = new WiimoteLib.ButtonState(); // 直前のボタンの状態
 
-        private System.Drawing.Point MaxXY; // ディスプレイのX,Y最大値
-        private System.Drawing.Point MinXY; // ディスプレイのX,Y最小値
-        private System.Drawing.Point Pt; // ポインタ位置
-        private int pointSpeed = 25; // レーザーポインタの移動速度
+        private List<System.Drawing.Rectangle> screenSizes = new List<System.Drawing.Rectangle>(); // ディスプレイの大きさ
+        private int selectedDisp; // 選択されているディスプレイ
+        private bool irDetected = false; // 赤外線を検出しているか
 
         private void ConnectWiimote()
         {
@@ -69,35 +82,33 @@ namespace Wiimote_PPT
                 mWiimote.SetLEDs(true, false, false, false);
 
                 mWiimote.SetRumble(true);
-                System.Threading.Thread.Sleep(250);
+                System.Threading.Thread.Sleep(200);
                 mWiimote.SetRumble(false);
 
             }
-            catch (WiimoteNotFoundException ex)
-            {
-                MessageBox.Show("Wiiリモコンを認識できませんでした。", "Wiimote PPT - エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Debug.WriteLine("Exit -> Wiimote Not Found.");
-                Debug.WriteLine(ex.ToString());
-
-                notifyIcon.Visible = false;
-                Environment.Exit(1);
-            }
-            catch (WiimoteException ex)
-            {
-                MessageBox.Show("Wiiリモコンに何らかのエラーが発生しました。", "Wiimote PPT - エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Debug.WriteLine("Exit -> Wiimote Exception.");
-                Debug.WriteLine(ex.ToString());
-
-                notifyIcon.Visible = false;
-                Environment.Exit(1);
-            }
             catch (Exception ex)
             {
-                MessageBox.Show("予期せぬエラーが発生しました。", "Wiimote PPT - エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Debug.WriteLine("Exit -> Unknown Error.");
-                Debug.WriteLine(ex.ToString());
+                string msg;
 
-                notifyIcon.Visible = false;
+                switch (ex)
+                {
+                    case WiimoteNotFoundException _:
+                        msg = "Wiiリモコンを認識できませんでした。";
+                        break;
+                    case WiimoteException _:
+                        msg = "Wiiリモコンに何らかのエラーが発生しました。";
+                        break;
+                    default:
+                        msg = "予期せぬエラーが発生しました。";
+                        break;
+                }
+
+                MessageBox.Show(
+                    msg,
+                    "エラー",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
                 Environment.Exit(1);
             }
         }
@@ -129,25 +140,35 @@ namespace Wiimote_PPT
             previousBtns = ws.ButtonState;
         }
 
-        private void MoveCursor(float dx, float dy)
-        {
-            // カーソルの移動 (変位)
-            Pt.X += (int)(dx * pointSpeed);
-            Pt.Y += (int)(dy * pointSpeed);
-
-            // ディスプレイの端判定
-            if (Pt.X < MinXY.X) Pt.X = MinXY.X;
-            if (Pt.Y < MinXY.Y) Pt.Y = MinXY.Y;
-
-            if (Pt.X > MaxXY.X) Pt.X = MaxXY.X;
-            if (Pt.Y > MaxXY.Y) Pt.Y = MaxXY.Y;
-
-            //マウスカーソルを変更
-            Cursor.Position = new System.Drawing.Point(this.Pt.X, this.Pt.Y);
-        }
-
         private void CheckAction(WiimoteState ws)
         {
+            // 赤外線
+            var ir = new List<KeyValuePair<int, PointF>>();
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (ws.IRState.IRSensors[i].Found)
+                {
+                    ir.Add(new KeyValuePair<int, PointF>(ws.IRState.IRSensors[i].Size, ws.IRState.IRSensors[i].Position));
+                }
+            }
+
+            if (ir.Count >= 2)
+            {
+                irDetected = true;
+
+                var q = ir.OrderByDescending(x => x.Key).Take(2).ToList();
+
+                var mouse_p = new System.Drawing.Point();
+                mouse_p.X = (int)((1.5 - (q[0].Value.X + q[1].Value.X)) * screenSizes[selectedDisp].Width + screenSizes[selectedDisp].X);
+                mouse_p.Y = (int)((q[0].Value.Y + q[1].Value.Y - 0.5) * screenSizes[selectedDisp].Height + screenSizes[selectedDisp].Y);
+                Cursor.Position = mouse_p;
+            }
+            else
+            {
+                irDetected = false;
+            }
+
             // Aボタン : 次のスライドへ (→)
             if (!ws.ButtonState.B && !previousBtns.A && ws.ButtonState.A)
             {
@@ -173,18 +194,6 @@ namespace Wiimote_PPT
                 SendKeys.Send("{LEFT}");
             }
 
-            // +ボタン : レーザーポインタの移動速度変更　加速
-            if (!previousBtns.Plus && ws.ButtonState.Plus)
-            {
-                pointSpeed += 5;
-            }
-
-            // -ボタン : レーザーポインタの移動速度変更　減速
-            if (!previousBtns.Minus && ws.ButtonState.Minus)
-            {
-                pointSpeed = Math.Max(1, pointSpeed - 5);
-            }
-
             // 1ボタン : F5 (スライドショー開始 最初から)
             if (!previousBtns.One && ws.ButtonState.One)
             {
@@ -203,7 +212,7 @@ namespace Wiimote_PPT
             if (previousBtns.Home && !ws.ButtonState.Home)
             {
                 var s = Screen.FromPoint(Cursor.Position);
-                Pt = new System.Drawing.Point(s.Bounds.X + s.Bounds.Width / 2, s.Bounds.Y + s.Bounds.Height / 2);
+                var Pt = new System.Drawing.Point(s.Bounds.X + s.Bounds.Width / 2, s.Bounds.Y + s.Bounds.Height / 2);
                 Cursor.Position = Pt;
             }
 
@@ -216,14 +225,38 @@ namespace Wiimote_PPT
                     SendKeys.Send("{ESC}");
                 }
 
+                // B + ←ボタン : ディスプレイ切り替え
+                if (!previousBtns.Left && ws.ButtonState.Left)
+                {
+                    selectedDisp = Math.Max(0, selectedDisp - 1);
+                }
+
+                // B + →ボタン : ディスプレイ切り替え
+                if (!previousBtns.Right && ws.ButtonState.Right)
+                {
+                    selectedDisp = Math.Min(screenSizes.Count - 1, selectedDisp + 1);
+                }
+
+                // B + -ボタン : 左クリック
+                if (!previousBtns.Minus && ws.ButtonState.Minus)
+                {
+                    WinAPI.mouse_event(WinAPI.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                    WinAPI.mouse_event(WinAPI.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                }
+
+                // B + +ボタン : 右クリック
+                if (!previousBtns.Plus && ws.ButtonState.Plus)
+                {
+                    WinAPI.mouse_event(WinAPI.MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
+                    WinAPI.mouse_event(WinAPI.MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+                }
+
                 // B + Aボタン : レーザーポインタ (押している間)
-                if (ws.ButtonState.A)
+                if (!previousBtns.A && ws.ButtonState.A)
                 {
                     // Ctrl + 左クリックの送信
                     WinAPI.keybd_event(0x11, 0, 0, (UIntPtr)0);
                     WinAPI.mouse_event(WinAPI.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                    // ポインタの移動
-                    MoveCursor(ws.AccelState.Values.X, ws.AccelState.Values.Y);
                 }
             }
 
@@ -231,15 +264,17 @@ namespace Wiimote_PPT
             if (!previousBtns.Down && ws.ButtonState.Down)
             {
                 if (this.Visible)
-                {
                     this.Hide();
-                }
                 else
-                {
-                    var battery = (ws.Battery > 0xc8 ? 0xc8 : (int)ws.Battery) / 200.0 * 100;
-                    boxStatus.Text = $"Battery : {battery:f1} %";
                     this.Show();
-                }
+            }
+
+            // 状態を表示
+            if (this.Visible)
+            {
+                var battery = (ws.Battery > 0xc8 ? 0xc8 : (int)ws.Battery) / 200.0 * 100;
+                boxStatus.Text = $"Battery : {battery:f1} %" + Environment.NewLine;
+                boxStatus.Text += "IR : " + (irDetected ? "Found" : "Lost") + Environment.NewLine;
             }
 
         }

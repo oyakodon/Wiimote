@@ -15,8 +15,11 @@ namespace Wiimote_DXLib
         private WiimoteLib.ButtonState previousBtns; // 直前のボタンの状態
         private bool wmActivated = false; // 移動有効/無効
         private float speed = 4.0f; // 視点移動速度
-        private const string mmdPath = "Pronama/プロ生ちゃん.pmx"; // MMDファイル(pmx,pmd...)のパス (exeからの)
-        static int hDebug_font; // デバッグ用フォントのハンドル
+        private static int hDebug_font; // デバッグ用フォントのハンドル
+
+        // MMDファイル(pmx,pmd...)のパス (exeからの)
+        // private const string mmdPath = "Pronama/プロ生ちゃん.pmx";
+        private const string mmdPath = "サーバルちゃんver1.01/サーバルちゃんver1.01.pmx";
 
         private　DX.VECTOR Model; // モデルの位置
         private DX.VECTOR V_point; // カメラの視点の方向

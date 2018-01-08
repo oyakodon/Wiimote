@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using static Wiimote_PPT.BTApi;
+using static Wiimote_IR.BTApi;
 
 
-namespace Wiimote_PPT
+namespace Wiimote_IR
 {
     public partial class BTUtil : Form
     {
@@ -56,8 +56,7 @@ namespace Wiimote_PPT
         /// Wiiリモコンとペアリングします。
         /// </summary>
         /// <param name="btdi">BLUETOOTH DEVICE INFO</param>
-        /// <param name="doSYNC">ホーム登録するか</param>
-        private unsafe void wii_pairing(BLUETOOTH_DEVICE_INFO btdi, bool doSYNC)
+        private unsafe void wii_pairing(BLUETOOTH_DEVICE_INFO btdi)
         {
             UInt32 ret = 0;
             if (btdi.fRemembered)
@@ -69,19 +68,15 @@ namespace Wiimote_PPT
                 throw new Exception("remove error.");
             }
 
-            if (doSYNC)
+            char[] pass = new char[6];
+            fixed (byte* addr = rinfo.address.rgBytes)
             {
-                char[] pass = new char[6];
-                fixed (byte* addr = rinfo.address.rgBytes)
-                {
-                    for (int i = 0; i < 6; i++)
-                        pass[i] = (char)addr[i];
-                }
-                ret = MyBluetoothAuthenticateDevice(IntPtr.Zero, hradio, ref btdi, pass, 6);
-                if (ret != 0)
-                {
-                    throw new Exception("auth error. " + ret);
-                }
+                for (int i = 0; i < 6; i++) pass[i] = (char)addr[i];
+            }
+            ret = MyBluetoothAuthenticateDevice(IntPtr.Zero, hradio, ref btdi, pass, 6);
+            if (ret != 0)
+            {
+                throw new Exception("auth error. " + ret);
             }
 
             ret = MyBluetoothSetServiceState(hradio, ref btdi,
@@ -224,24 +219,13 @@ namespace Wiimote_PPT
                                 bgClose();
                             }
 
-                            if (doPair)
+                            if (doPair || (!btdi.fRemembered && !btdi.fAuthenticated && !btdi.fConnected))
                             {
                                 // Wiiリモコンとのペアリング
-                                Debug.WriteLine("Do Pairing(SYNC).");
+                                Debug.WriteLine("Do Pairing.");
                                 doPair = false;
                                 System.Threading.Thread.Sleep(1000);
-                                wii_pairing(btdi, true);
-                                System.Threading.Thread.Sleep(1000);
-                                bgClose();
-                            }
-
-                            if (!btdi.fRemembered && !btdi.fAuthenticated && !btdi.fConnected)
-                            {
-                                // Wiiリモコンとのペアリング(ホーム登録無し)
-                                Debug.WriteLine("Do Pairing(NO SYNC).");
-                                doPair = false;
-                                System.Threading.Thread.Sleep(1000);
-                                wii_pairing(btdi, false);
+                                wii_pairing(btdi);
                                 System.Threading.Thread.Sleep(1000);
                                 bgClose();
                             }
