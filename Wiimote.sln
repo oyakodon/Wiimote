@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiimote_IOCheck", "Wiimote_IOCheck\Wiimote_IOCheck.csproj", "{77F99429-19B7-4403-B874-09098A112A4C}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiimote_PPT", "Wiimote_PPT\Wiimote_PPT.csproj", "{897CC98D-730C-4D19-9072-DA5B57DE5A8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiimote_IR", "Wiimote_IR\Wiimote_IR.csproj", "{D855603E-5AFB-4EFC-8F61-41AD6E403B09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiimote_Connection", "Wiimote_Connection\Wiimote_Connection.csproj", "{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,8 +73,19 @@ Global
 		{D855603E-5AFB-4EFC-8F61-41AD6E403B09}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D855603E-5AFB-4EFC-8F61-41AD6E403B09}.Release|x86.ActiveCfg = Release|Any CPU
 		{D855603E-5AFB-4EFC-8F61-41AD6E403B09}.Release|x86.Build.0 = Release|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Debug|x86.Build.0 = Debug|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Release|x86.ActiveCfg = Release|Any CPU
+		{C7678B68-6FD3-4086-8677-5BC5BE4BEADA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3CCC0363-057D-4864-84A0-EE53EA3CA70A}
 	EndGlobalSection
 EndGlobal
